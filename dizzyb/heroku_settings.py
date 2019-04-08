@@ -1,4 +1,4 @@
-from freeshelf.settings import *
+from dizzyb.settings import *
    # imports everything from the 'settings.py' file
 import django_heroku
 
