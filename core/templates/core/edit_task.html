@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Edit task</h2>
+
+<form method="POST" class="">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="">
+            <div class="{% if field.field.required %}b{% endif %}">{{ field.label_tag }}</div>
+            <div>{{ field }}</div>
+            {% if field.help_text %}
+                <p class="help">{{ field.help_text|safe }}</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+    <button type="submit">Save task</button>
+</form>
+
+<h3>Notes</h3>
+
+{% for note in task.notes.all %}
+    <div class="" id="note-{{ note.id }}">
+        <div>{{ note.text }}</div>
+        <div>{{ note.created_at }}</div>
+    </div>
+{% endfor %}
+
+<form method="POST" class="" action="{% url 'new_note' task_id=task.hashid %}">
+    {% csrf_token %}
+    {{ note_form.as_p }}
+    <button type="submit">Add note</button>
+</form>
+
+{% endblock %}
