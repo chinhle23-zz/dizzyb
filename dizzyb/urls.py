@@ -15,12 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import RedirectView
+from core import views as core_views
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('core/', include('core.urls')),
-   path('', RedirectView.as_view(url='/core/', permanent=True)),
+    path('', core_views.index, name='index'),
+    path('tasks/<int:task_id>/', core_views.edit_task, name='edit_task'),
+    # path('tasks/<hashid:task_id>/', core_views.edit_task, name='edit_task')
+    path('tasks/<int:task_id>/notes/', core_views.new_note, name='new_note'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
