@@ -23,6 +23,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('core/', include('core.urls')),
     path('', core_views.index, name='index'),
+    path('tasks/', core_views.task_list, name='task-list'),
+    path('tasks/complete/', core_views.task_list, kwargs={'group': 'complete'}, name='task_list_complete'),
+    path('tasks/future/', core_views.task_list, kwargs={'group': 'future'}, name='task_list_future'),
+    path('tasks/tagged/<tag>', core_views.task_list, kwargs={'group': 'tagged'}, name='task_list_tagged'),
     path('tasks/<int:task_id>/', core_views.edit_task, name='edit_task'),
     # path('tasks/<hashid:task_id>/', core_views.edit_task, name='edit_task')
     path('tasks/<int:task_id>/notes/', core_views.new_note, name='new_note'),
