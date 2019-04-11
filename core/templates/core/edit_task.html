@@ -19,7 +19,7 @@
 
 <h3>Notes</h3>
 
-{% for note in task.notes.all %}
+{% for note in notes %}
     <div class="" id="note-{{ note.id }}">
         <div>{{ note.text }}</div>
         <div>{{ note.created_at }}</div>

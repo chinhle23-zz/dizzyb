@@ -1,6 +1,22 @@
 from django.db import models
 from django.contrib.auth.models import User, AbstractUser
 
+
+def get_hashtags(text):
+    """
+    Split a string by spaces, then strip off punctuation, returning only the words
+    that start with a pound sign.
+    """
+    tags = set([
+        item.strip("#.,-\"\'&*^!")
+            # strip out punctuation (this is done last) 
+        for item in text.split() 
+            # splits text by spaces
+        if item.startswith("#")
+            # only return words that start with '#'
+        ])
+    return tags
+
 # Create your models here.
 # class User(AbstractUser):
 #     pass
@@ -25,9 +41,10 @@ class Task(models.Model):
         # https://docs.djangoproject.com/en/2.2/ref/models/fields/#datefield
         # 'hide until' is the verbose_name?
 
-    # @property
+    # @property # don't treat this like a method, but treat like an attribute to avoid paranthesis to call it...the function definition can't take any arguments
     # def hashid(self):
     #     return hashids.encode(self.pk)
+            # https://hashids.org/
 
     def is_complete(self):
         return self.completed_at is not None
@@ -48,9 +65,26 @@ class Task(models.Model):
             self.save()
         return self
 
-    # def save(self, *args, **kwargs): 
-    #     super().save(*args, **kwargs)
-    #     self.parse_tags()
+    def save(self, *args, **kwargs): 
+        # when you override a built-in function and you don't know what argument it takes, you pass it along with the super() statement below
+        super().save(*args, **kwargs)
+            # Task object needs to be saved first before parse_tags() can be called due to M2M relationship
+        self.parse_tags()
+
+    def parse_tags(self):
+        """
+        Read through the description of the task and pull out any tags.
+        Create Tag model objects for these and associate them.
+        """
+        tags = []
+        text_tags = get_hashtags(self.description)
+        for tag_text in text_tags:
+            tag, _ = Tag.objects.get_or_create(text=tag_text)
+                # https://docs.djangoproject.com/en/2.2/ref/models/querysets/#get-or-create
+            tags.append(tag)
+        self.tags.set(tags)
+            # https://docs.djangoproject.com/en/2.2/topics/db/examples/many_to_many/
+            # relation sets can be set...'set(<a list>)'
 
 
 class Note(models.Model):
@@ -58,3 +92,21 @@ class Note(models.Model):
     text = models.TextField()
     created_at = models.DateTimeField(null=True, auto_now_add=True)
         # updated_at = models.DateTimeField(null=True, auto_now=True)
+
+class Tag(models.Model):
+    """
+    Represents a tag or hashtag -- a free-form category that we can add to tasks.
+
+    - Tags should be case-insensitive
+    """
+
+    # This should be enforced to be unique in a case-insenstive fashion
+    # but we are leaving it for now
+    text = models.CharField(max_length=100, unique=True, help_text='Tag text (must be lowercase)')
+    tasks = models.ManyToManyField(to=Task, related_name='tags')
+
+    def __str__(self):
+        """String for representing the Tag object."""
+        return self.text
+
+
