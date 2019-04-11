@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, resolve_url
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.http import Http404
@@ -27,15 +27,23 @@ def edit_task(request, task_id):
     if request.method == 'POST':
         # if user is submitting a form
         form = EditTaskForm(instance=task, data=request.POST)
-        if form.save():
+        if form.is_valid():
+            form.save()
             return redirect('task-list')
     else:
         # else make a new form
         form = EditTaskForm(instance=task)
 
+    ### statements below run when none of the if statements above hit due to errors/invalid input ###
+
     note_form = NoteForm()
 
-    return render(request, 'core/edit_task.html', {'form':form, 'note_form': note_form, 'task': task})
+    return render(request, 'core/edit_task.html', {
+        'form':form, 
+        'note_form': note_form, 
+        'task': task, 
+        'notes': task.notes.order_by('created_at')
+        })
 
 @require_http_methods(['POST'])
 @login_required
@@ -54,8 +62,11 @@ def new_note(request, task_id):
     else:
         messages.error(request, 'We have a problem saving your note.')
 
-    return redirect(to='edit_task', task_id=task.pk)
-    # return redirect(to='edit_task', task_id=task.hashid)
+    redirect_url = resolve_url(to='edit_task', task_id=task.pk)
+    # redirect_url = resolve_url(to='edit_task', task_id=task.hashid)
+
+    return redirect(to=f'{redirect_url}#note-{note.pk}')
+        # '#' hashtag used in URL to be able to redirect with anchor, so page does not refresh to top of page each time a new note is added.
 
 @require_http_methods(['POST'])
 @login_required
