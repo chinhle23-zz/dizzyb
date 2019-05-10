@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Task, Note
+from .models import Task, Note, Tag
 
 # Register your models here.
 @admin.register(Task)
@@ -9,3 +9,7 @@ class TaskAdmin(admin.ModelAdmin):
 @admin.register(Note)
 class NoteAdmin(admin.ModelAdmin):
     list_display = ('task', 'text', 'created_at')
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('text', )

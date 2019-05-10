@@ -4,12 +4,15 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+prospector = "*"
 
 [packages]
 django = "*"
 psycopg2 = "*"
 django-heroku = "*"
 gunicorn = "*"
+django-debug-toolbar = "*"
+django-registration-redux = "*"
 
 [requires]
 python_version = "3.7"

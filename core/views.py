@@ -4,7 +4,7 @@ from django.views.decorators.http import require_http_methods
 from django.http import Http404
 from django.contrib import messages
 from .models import Tag
-from .forms import NewTaskForm, NoteForm
+from core.forms import NewTaskForm, NoteForm, EditTaskForm
 from datetime import date
 
 # Create your views here.
@@ -44,6 +44,9 @@ def task_list(request, group=None, tag=None):
     }
 
     return render(request, 'core/task_list.html', context=context)
+
+
+
 
 @require_http_methods(['GET', 'POST'])
 @login_required
@@ -105,3 +108,30 @@ def new_task(request, task_id):
     if form.is_valid():
         form.save(owner=request.user)
     return redirect('task_list')
+
+@require_http_methods(['POST'])
+@login_required
+def mark_task_complete(request, task_id):
+    task = request.user.tasks.with_hashid(task_id)
+    if task is None:
+        raise Http404('No task matches the given query.')
+    task.mark_complete()
+
+    if request.is_ajax():
+        # return JsonResponse({"id": task.hashid, "complete": True})
+        return JsonResponse({"complete": True})
+
+    return redirect('task_list')
+
+@require_http_methods(['POST'])
+@login_required
+def mark_task_current(request, task_id):
+    task = request.user.tasks.with_hashid(task_id)
+    if task is None:
+        raise Http404('No task matches the given query.')
+    task.mark_current()
+
+    # if request.is_ajax():
+    #     return JsonResponse(serialize('json', task))
+
+    return redirect('task_list_future')

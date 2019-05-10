@@ -31,14 +31,24 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # my apps --> placed first to be able to modify django-registration-redux templates
+    # 'core.apps.CoreConfig', # MDN tutorial way
+    'core', #--Clinton's way
+
+    # 3rd-party apps that have to come first
+    'registration', # required for django-registration-redux
+
+    # Built-in Django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core.apps.CoreConfig', # MDN tutorial way
-    # 'core', --Clinton's way
+    'django.contrib.humanize',
+
+    # 3rd-party apps
+    'debug_toolbar', # added 4/12/2019
 ]
 
 MIDDLEWARE = [
@@ -49,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'dizzyb.urls'
@@ -110,7 +121,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/New_York'
 
 USE_I18N = True
 
@@ -123,3 +134,19 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
+INTERNAL_IPS = [
+    '127.0.0.1', 
+]
+
+# Registration
+ACCOUNT_ACTIVATION_DAYS = 7
+LOGIN_REDIRECT_URL = '/'
+REGISTRATION_FORM = 'core.forms.CustomRegistrationForm'
+    # https://django-registration-redux.readthedocs.io/en/latest/forms.html#multiple-form-inheritance
+
+# Email
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

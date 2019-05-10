@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>{% block title %}dizzyb{% endblock %}</title>
+  <!-- <link rel="stylesheet" href="{% static 'css/tachyons.min.css' %}"> -->
+  <link rel="stylesheet" href="{% static 'css/dizzyb.css' %}">  
+  <!--<script src="{% static 'build/bundle.js' %}"></script>-->
+  <script src="dizzyb.js"></script>
+  {% block meta %}{% endblock %}
+</head>
+<body class="">
+  <div class="">
+    <header class="">
+      <div class=""><img class="" src="{% static 'img/yellow_bee.png' %}" role="presentation"></div>
+      <div class="" style="flex-grow: 1;">
+        <a class="" href="/">dizzyb</a>
+      </div>
+      <div class="">
+        {% if request.user.is_authenticated %}  
+            <a class="" href="{% url 'task_list' %}">{{ user.username }}</a>
+            <a class="" href="{% url 'auth_logout' %}">Logout</a>  
+        {% else %} 
+        <a class="" href="{% url 'auth_login' %}">Register / Login</a>  
+        {% endif %}   
+      </div>
+    </header>
+    <div class="">
+    {% block content %}{% endblock %}
+    </div>
+  </div>
+  <script src="{% static 'js/dizzyb.js' %}"></script>
+  <script src="{% static 'js/js.cookie.js' %}"></script>
+</body>
+</html>
