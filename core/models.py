@@ -1,5 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User, AbstractUser
+from django.db.models import Q
+    # need to figure out what this is
+from django.utils import timezone
+from datetime import date
 
 
 def get_hashtags(text):
@@ -21,15 +25,37 @@ def get_hashtags(text):
 # class User(AbstractUser):
 #     pass
 
-# class TaskQuerySet(models.QuerySet):
-#     pass
+#### Review QuerySet ####
+class TaskQuerySet(models.QuerySet):
+
+    # def with_hashid(self, hashid):
+    #     ids = hashids.decode(hashid)
+    #     # TODO add check -- if len is 0, hashid is invalid, should raise exception
+    #     if len(ids) == 1:
+    #         return self.get(pk=ids[0])
+    #     return self.filter(pk__in=ids)
+
+    def incomplete(self):
+        return self.filter(completed_at__isnull=True)
+
+    def complete(self):
+        return self.filter(completed_at__isnull=False).order_by('completed_at')
+
+    def current(self):
+        return self.incomplete().filter(
+            Q(show_on__isnull=True) | Q(show_on__lte=date.today()))
+
+    def future(self):
+        return self.incomplete().filter(
+            show_on__isnull=False, show_on__gt=date.today())
+#### Review QuerySet ####
 
 class Task(models.Model):
 
     class Meta:
         base_manager_name = 'objects'
 
-    # objects = TaskQuerySet.as_manager()
+    objects = TaskQuerySet.as_manager()
         # what is this?
     description = models.CharField('Task', max_length=512)
         # https://docs.djangoproject.com/en/2.2/ref/models/fields/#charfield
@@ -53,7 +79,7 @@ class Task(models.Model):
         return not self.is_complete and (self.show_on is None or self.show_on <= date.today())
 
     def is_future(self):
-        return not self.is_complet() and (self.show_on is not None and self.show_on > date.today())
+        return not self.is_complete() and (self.show_on is not None and self.show_on > date.today())
 
     def mark_complete(self, save=True):
         """

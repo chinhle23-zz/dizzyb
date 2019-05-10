@@ -2,6 +2,10 @@
 
 {# {% load querystring %} #}
 
+{% load hashtags %}
+{% load humanize %}
+  {#<!-- https://docs.djangoproject.com/en/2.2/ref/contrib/humanize/ -->#}
+
 {% block content %}
 <div class="">
   <div class="">
@@ -18,20 +22,75 @@
       autofocus aria-label="New task" id="{{ form.task.id_for_label }}">
   </form>
 </div>
-<div class="mv4" id="task-list">
+<div class="">
   {% for task in tasks.all %}
-    {% include "partials/task.html" %}
-  {% empty %}
-    <div>No tasks to show.</div>
+  <div id="task-{{ task.id }}" class="">
+    <div class="">
+      <div class="">
+        <div class="">{{task.description|link_hashtags}}</div>
+        <div class="">
+          <span class="">#{{ task.id }}</span>
+          {% if task.show_on and task.show_on >= today %}
+          <span class="">Hide until {{ task.show_on|naturalday }}</span>
+            {#<!-- https://docs.djangoproject.com/en/2.2/ref/contrib/humanize/#naturalday -->#}
+          {% endif %}
+
+          {% if task.due_on %}
+          <span class="{% if task.due_on <= today %}red{% endif %}">Due {{task.due_on|naturalday}}</span>
+          {% endif %}
+
+          {% if task.completed_at %}
+          <span class="">Completed {{task.completed_at|naturalday}}</span>
+          {% endif %}
+
+          {% if task.note_count > 0 %}
+          <span class ="">
+            <a href="{% url 'edit_task' task_id=task.id %}#notes">{{task.note_count}} note{{task.note_count|pluralize}}</a>
+              {#<!-- https://docs.djangoproject.com/en/2.2/ref/templates/builtins/#pluralize -->#}
+          </span>
+          <span class ="">
+            Updated {{ task.last_note_created_at|naturalday }}
+          </span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="">
+          <a href="{% url 'edit_task' task_id=task.id %}">Edit task</a>
+          {% if task.is_future %}
+            <form class="dib" method="POST" action="{% url 'mark_task_current' task_id=task.id %}">
+              {% csrf_token %}
+              <button class="">Make currrent</button> 
+            </form>
+          {% endif %}
+          {% if not task.is_complete %}
+            <form data-task-id="{{ task.id }}" class="mark-task-complete dib" method="POST" action="{% url 'mark_task_complete' task_id=task.id %}">
+              {% csrf_token %}
+              <button class="">Mark complete</button> 
+            </form>
+          {% endif %}
+      </div>
+      {% comment %}
+      <!-- <div class="" id="task-list">
+        {% for task in tasks.all %}
+          {% include "partials/task.html" %}
+        {% empty %}
+          {#<!-- https://docs.djangoproject.com/en/2.2/ref/templates/builtins/#for-empty -->#}
+          <div>No tasks to show.</div>
+        {% endfor %}
+      </div> -->
+      {% endcomment %}
+      <div class="">
+          <h2>Tags</h2>
+          <ul>
+              {% for tag in tags %}
+                  <li><a href="{% url 'task_list_tagged' tag=tag.text %}">#{{ tag.text }}</a></li>
+              {% endfor %}
+          </ul>
+      </div>
+    </div>
+  </div>
   {% endfor %}
 </div>
 
-<div class="">
-    <h2>Tags</h2>
-    <ul>
-        {% for tag in tags %}
-            <li><a href="{% url 'task_list_tagged' tag=tag.text %}">#{{ tag.text }}</a></li>
-        {% endfor %}
-    </ul>
-</div>
+
 {% endblock %}
