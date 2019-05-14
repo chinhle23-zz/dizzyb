@@ -103,7 +103,7 @@ def new_note(request, task_id):
 
 @require_http_methods(['POST'])
 @login_required
-def new_task(request, task_id):
+def new_task(request):
     form = NewTaskForm(request.POST)
     if form.is_valid():
         form.save(owner=request.user)
