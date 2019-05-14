@@ -18,7 +18,7 @@
 <div class="">
   <form id="new-task-form" method="POST" action="{% url 'new_task' %}">
     {% csrf_token %}
-    <input type="text" id="task-field" class="" name="task" placeholder="add a new task" maxlength="512" required
+    <input type="text" id="task-field" class="new_task_input" name="task" placeholder="add a new task" maxlength="512" required
       autofocus aria-label="New task" id="{{ form.task.id_for_label }}">
   </form>
 </div>
@@ -27,9 +27,9 @@
   <div id="task-{{ task.id }}" class="task">
     <div class="">
       <div class="">
-        <div class="">{{task.description|link_hashtags}}</div>
+        <div class="">{{task.description|link_hashtags}} <span class=""> | task# {{ task.id }}</span></div>
         <div class="">
-          <span class="">#{{ task.id }}</span>
+          
           {% if task.show_on and task.show_on >= today %}
           <span class="">Hide until {{ task.show_on|naturalday }}</span>
             {#<!-- https://docs.djangoproject.com/en/2.2/ref/contrib/humanize/#naturalday -->#}
@@ -84,13 +84,13 @@
     </div>
   </div>
   {% endfor %}
-  <div class="">
-    <h2>Tags</h2>
-    <ul>
+  <div class="tags">
+    <h3>Tags</h3>
+    <div>
         {% for tag in tags %}
-          <li><a href="{% url 'task_list_tagged' tag=tag.text %}">#{{ tag.text }}</a></li>
+          <span><a href="{% url 'task_list_tagged' tag=tag.text %}">#{{ tag.text }} </a></span>
         {% endfor %}
-    </ul>
+    </div>
   </div>
 </div>
 

@@ -43,7 +43,9 @@ class CustomRegistrationForm(RegistrationForm):
         }
         
 class NewTaskForm(forms.Form):
-    task = forms.CharField(label='Task', max_length=512, widget=forms.TextInput(attrs={'placeholder': 'add a new task'}))
+    task = forms.CharField(label='Task', max_length=512, widget=forms.TextInput(attrs={
+        'placeholder': 'add a new task',
+        }))
 
     def save(self, **kwargs):
         if self.is_valid():
