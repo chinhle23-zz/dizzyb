@@ -79,18 +79,19 @@
         {% endfor %}
       </div>
       {% endcomment %} -->
-      <div class="">
-          <h2>Tags</h2>
-          <ul>
-              {% for tag in tags %}
-                  <li><a href="{% url 'task_list_tagged' tag=tag.text %}">#{{ tag.text }}</a></li>
-              {% endfor %}
-          </ul>
-      </div>
+      
       
     </div>
   </div>
   {% endfor %}
+  <div class="">
+    <h2>Tags</h2>
+    <ul>
+        {% for tag in tags %}
+          <li><a href="{% url 'task_list_tagged' tag=tag.text %}">#{{ tag.text }}</a></li>
+        {% endfor %}
+    </ul>
+  </div>
 </div>
 
 
